@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.myweb.basic.product.ProductMapper">
+ 	
+ 	<insert id="productRegist">
+ 		insert into product(prod_enddate,
+ 							prod_category,
+ 							prod_writer,
+ 							prod_name,
+ 							prod_price,
+ 							prod_count,
+ 							prod_discount,
+ 							prod_purchase_yn,
+ 							prod_content,
+ 							prod_comment)
+ 					values(#{prod_enddate},
+ 						   #{prod_category},
+ 						   #{prod_writer},
+ 						   #{prod_name},
+ 						   #{prod_price},
+ 						   #{prod_count},
+ 						   #{prod_discount},
+ 						   #{prod_purchase_yn},
+ 						   #{prod_content},
+ 						   #{prod_comment})
+ 	</insert>
+ 	
+ 	<!-- 
+ 	1. insert전에 특정테이블의 키값이 반드시 필요한 경우 selectKey를 사용합니다.
+ 	조회한 결과를 insert시에 전달하는 vo에 keyProperty에 저장해주는 역할을 합니다.
+ 	
+ 	2. selectKey를 통해서 나온 결과의 row는 1개여야 합니다.
+ 	
+ 	3. order옵션은 insert이전에 실행하는지, 이후에 사용하는지 여부
+ 	 -->
+ 	
+ 	
+ 	<insert id="productRegistFile">
+ 		<selectKey resultType="int" keyProperty="prod_id" order="BEFORE">
+ 			select max(prod_id) as prod_id 
+			from product where prod_writer = #{prod_writer}
+ 		</selectKey>
+ 		
+ 	
+ 		insert into PRODUCT_UPLOAD(filename,
+ 								   filepath,
+ 								   uuid,
+ 								   prod_id,
+ 								   prod_writer
+ 								   )
+ 		values(#{filename},
+ 			   #{filepath},
+ 			   #{uuid},
+ 			   #{prod_id},
+ 			   #{prod_writer}
+ 			  )				
+ 	</insert>
+ 
+ 
+ 	<!-- limit (페이지 -1) * 데이터개수, 데이터개수 -->
+ 	<!-- 동적쿼리에 test에 들어가는 값은 vo의 getter, map의 key값이 들어갑니다 -->
+ 	<select id="getList" resultType="ProductVO">
+		select p.*,
+			   c.category_nav
+ 		from product p
+ 		left outer join (SELECT CONCAT(A1.group_ID, A1.CATEGORY_ID) AS CATEGORY_KEY, ##카테고리 키 (그룹 + 키 형태로 카테고리분류)
+							   CASE A1.category_parent_LV
+									WHEN 0 THEN A1.category_detail_NM
+									WHEN 1 THEN CONCAT(A2.category_detail_NM,' > ', A1.category_detail_NM)
+									WHEN 2 THEN CONCAT(A3.category_detail_NM, ' > ', A2.category_detail_NM,' > ', A1.category_detail_NM)
+							   END as CATEGORY_NAV
+						FROM PRODUCT_CATEGORY A1
+						LEFT OUTER JOIN PRODUCT_CATEGORY A2
+						ON A1.CATEGORY_PARENT_LV = A2.CATEGORY_LV AND A1.CATEGORY_DETAIL_PARENT_LV = A2.CATEGORY_DETAIL_LV AND A1.GROUP_ID = A2.GROUP_ID
+						LEFT OUTER JOIN PRODUCT_CATEGORY A3
+						ON A2.CATEGORY_PARENT_LV = A3.CATEGORY_LV AND A2.CATEGORY_DETAIL_PARENT_LV = A3.CATEGORY_DETAIL_LV
+						ORDER BY CATEGORY_NAV ASC) c
+ 		on p.prod_category = c.category_key
+ 		where prod_writer = #{userId} 
+ 		
+ 		<if test="searchName != '' and searchName != null"> 
+ 		and prod_name like concat('%', #{searchName} ,'%')
+ 		</if>
+ 		<if test="searchContent != '' and searchContent != null">
+ 		and prod_content like concat('%', #{searchContent}, '%')	
+ 		</if>
+ 		<if test="startDate != '' and startDate != null">
+ 			<![CDATA[and date_format(prod_enddate, '%Y-%m-%d')  >= date_format(#{startDate}, '%Y-%m-%d')]]>
+ 		</if>
+ 		<if test="endDate != '' and endDate != null">
+      		<![CDATA[and date_format(prod_enddate, '%Y-%m-%d')  < date_format(#{endDate}, '%Y-%m-%d')]]>
+ 		</if>
+ 		order by 
+ 		<if test="searchPrice == 'asc' ">
+ 			prod_price asc,
+ 		</if>
+ 		<if test="searchPrice == 'desc' ">
+ 			prod_price desc,
+ 		</if>
+ 		prod_id desc
+ 		limit #{pageStart}, #{amount}
+ 		
+ 		
+ 	</select>
+ 
+ 	<select id="getTotal" resultType="int">
+ 		select count(*) as total
+ 		from product
+ 		where prod_writer = #{userId}
+ 		<if test="searchName != '' and searchName != null"> 
+ 		and prod_name like concat('%', #{searchName} ,'%')
+ 		</if>
+ 		<if test="searchContent != '' and searchContent != null">
+ 		and prod_content like concat('%', #{searchContent}, '%')	
+ 		</if>
+ 		<if test="startDate != '' and startDate != null">
+ 			<![CDATA[and date_format(prod_enddate, '%Y-%m-%d')  >= date_format(#{startDate}, '%Y-%m-%d')]]>
+ 		</if>
+ 		<if test="endDate != '' and endDate != null">
+      		<![CDATA[and date_format(prod_enddate, '%Y-%m-%d')  < date_format(#{endDate}, '%Y-%m-%d')]]>
+ 		</if>
+ 	</select>
+ 
+ 
+ 	<select id="getDetail" resultType="ProductVO">
+ 		select p.*,
+ 			   c.category_nav
+ 		from product p
+ 		left outer join (SELECT CONCAT(A1.group_ID, A1.CATEGORY_ID) AS CATEGORY_KEY, ##카테고리 키 (그룹 + 키 형태로 카테고리분류)
+							   CASE A1.category_parent_LV
+									WHEN 0 THEN A1.category_detail_NM
+									WHEN 1 THEN CONCAT(A2.category_detail_NM,' > ', A1.category_detail_NM)
+									WHEN 2 THEN CONCAT(A3.category_detail_NM, ' > ', A2.category_detail_NM,' > ', A1.category_detail_NM)
+							   END as CATEGORY_NAV
+						FROM PRODUCT_CATEGORY A1
+						LEFT OUTER JOIN PRODUCT_CATEGORY A2
+						ON A1.CATEGORY_PARENT_LV = A2.CATEGORY_LV AND A1.CATEGORY_DETAIL_PARENT_LV = A2.CATEGORY_DETAIL_LV AND A1.GROUP_ID = A2.GROUP_ID
+						LEFT OUTER JOIN PRODUCT_CATEGORY A3
+						ON A2.CATEGORY_PARENT_LV = A3.CATEGORY_LV AND A2.CATEGORY_DETAIL_PARENT_LV = A3.CATEGORY_DETAIL_LV
+						ORDER BY CATEGORY_NAV ASC) c
+ 		on p.prod_category = c.category_key
+ 		where prod_id = #{prod_id}
+ 	</select>
+ 	
+ 	<select id="getDetailImg" resultType="UploadVO">
+ 		select * from product_upload where prod_id = #{prod_id}
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	<update id="productUpdate">
+ 		update product
+ 		set prod_enddate = #{prod_enddate},
+ 			prod_name = #{prod_name},
+ 			prod_price = #{prod_price},
+ 			prod_count = #{prod_count},
+ 			prod_discount = #{prod_discount},
+ 			prod_purchase_yn = #{prod_purchase_yn},
+ 			prod_content = #{prod_content},
+ 			prod_comment = #{prod_comment}
+ 		where prod_id = #{prod_id}
+ 	</update>
+ 	
+ 	<delete id="productDelete">
+ 		delete from product
+ 		where prod_id = #{prod_id}
+ 	</delete>
+ 	
+ 	<!-- 첫번째 카테고리 -->
+ 	<select id="getCategory" resultType="CategoryVO">
+ 		select *
+ 		from product_category
+ 		where category_lv = 1
+ 	</select>
+ 	
+ 	<!-- 두번쨰, 세번째 카테고리 -->
+ 	<select id="getCategoryChild" resultType="CategoryVO">
+ 		select *
+ 		from product_category
+ 		where group_id = #{group_id}
+ 		and category_parent_lv = #{category_lv}
+ 		and category_detail_parent_lv = #{category_detail_lv}
+ 	</select>
+ 	
+ 	
+ 
+ 
+</mapper>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- .wrap이 basicLayout에 setContent함수에 전달 -->
+<th:block th:replace="~{./include/basicLayout :: setContent( ~{:: .wrap}  ) }">
+
+
+	<div class="wrap">
+		<div class="warp_inner">
+
+			<!-- left_menu end -->
+			<div class="right_content">
+				
+				<div class="midiaq">
+					<div class="mainWrapper"> 
+						<div class="ipssGiudeBlock" style="color:red; font-size: large;">
+							-요구사항<br>
+							-판매자들이 소통하는 글에 대한 CRUD작업을 연습합니다.<br>
+                            -모든 판매자가 작성한 글이 보여집니다.<br>
+							-제목, 닉네임 으로 검색이 가능합니다.<br>
+							-내용 클릭시 상세보기로 넘어 갑니다.<br>
+						
+							
+						</div>
+					</div>
+					<div class="page_title">관리자검색</div>
+					
+					<form name="###########" action="noticeListAll" method="get" >
+					<div class="search_block flfull">
+
+						<!-- 
+							검색버튼을 클릭할때 page, amount, 검색키워드를 넘깁니다
+							1. hidden태그를 이용해서 page번호는 1번으로 넘깁니다(검색은 1번페이지로 다시시작)
+						-->
+						<input type="hidden" name="page" value="1">
+						<input type="hidden" name="amount" th:value="${pageDTO.amount}">
+
+						<div class="fl">
+							<div>
+								<span class="search_th">아이디 검색</span>
+								<input type="text" class="" name="writer" th:value="${cri.writer}" placeholder="아이디 검색">
+							</div>
+							<div>
+								<span class="search_th">제목 검색</span>
+								<input type="text" class="" name="title" th:value="${cri.title}" placeholder="제목 검색">
+							</div>
+							<div>
+								<span class="search_th">내용 검색</span>
+								<input type="text" class="" name="content" th:value="${cri.content}" placeholder="내용 검색">
+							</div>
+
+
+						</div>
+
+						<div class="fr">
+							<div class="search_btn_area">
+								<a href="#" class="normal_btn purplebtn" id="noticeSearch">검색</a>
+								<a href="#" class="normal_btn purplebtn02">등록</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="full_collum collum">
+						<ul>
+							<li class="collum_tit">
+								<h2>판매자 소통공간 - 전체게시글수 [[${pageDTO.total}]]</h2>
+
+								<select class="">
+									<option value="10">10개 보기</option>
+									<option value="20">20개 보기</option>
+									<option value="40">40개 보기</option>
+									<option value="80">80개 보기</option>
+								</select>
+								<span class="showtoggle minus"></span>
+								<ul>
+									<li>
+										<table cellpadding="0" cellspacing="0" class="row_tb_7" width="100%;">
+											<tr>
+												<th>순서</th>
+												<th>번호(PK)</th>
+												<th>아이디</th>
+												<th>제목</th>
+												<th>내용</th>
+												<th>등록일</th>
+											</tr>
+												
+											<tr th:each="vo, status : ${pageDTO.pageData }">
+												<td>[[${status.count}]]</td>
+												<td>[[${vo.nno}]]</td>
+												<td>[[${vo.writer}]]</td>
+												<td>[[${vo.title}]]</td>
+												<td>
+													<a title="상세보기(클릭)" th:href="@{noticeDetail(nno=${vo.nno} )}">[[${vo.content}]]</a>
+												</td>
+												<td>[[${ #temporals.format(vo.regdate, 'yyyy-MM-dd')  }]]</td>
+											</tr>
+
+										</table>
+
+										<!-- 
+										<div class="page">
+											<ul>
+												<li>
+													<a th:href="@{noticeListAll(page=1, amount=${pageDTO.amount}) }"><i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
+												</li>
+												<li th:if="${pageDTO.prev}">
+													<a th:href="@{noticeListAll(page=${pageDTO.start-1}, amount=${pageDTO.amount} )}"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+												</li>
+												<th:block th:each="num : ${pageDTO.pageList}">
+												<li th:class="${num == pageDTO.page ? 'on': '' }">
+													<a th:href="@{noticeListAll(page=${num}, amount=${pageDTO.amount} )}">[[${num}]]</a>
+												</li>
+												</th:block>
+												<li th:if="${pageDTO.next}">
+													<a th:href="@{noticeListAll(page=${pageDTO.end+1}, amount=${pageDTO.amount} )}"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+												</li>
+												
+												<li>
+													<a th:href="@{noticeListAll(page=${pageDTO.pageTotal}, amount=${pageDTO.amount} )}"><i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
+												</li>
+				
+											</ul>
+										</div>
+										-->
+										
+										<div class="page">
+											<ul>
+												<li>
+													<a th:href="@{noticeListAll(page=1, 
+																				amount=${pageDTO.amount},
+																				writer=${cri.writer},
+																				title=${cri.title},
+																				content=${cri.content} )}"><i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
+												</li>
+												
+												<li th:if="${pageDTO.prev}">
+													<a th:href="@{noticeListAll(page=${pageDTO.start-1},
+																				amount=${pageDTO.amount},
+																				writer=${cri.writer},
+																				title=${cri.title},
+																				content=${cri.content} )}"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+												</li>
+												
+												<th:block th:each="num : ${pageDTO.pageList}">
+												<li th:class="${num == pageDTO.page ? 'on': '' }">
+													<a th:href="@{noticeListAll(page=${num}, 
+																				amount=${pageDTO.amount},
+																				writer=${cri.writer},
+																				title=${cri.title},
+																				content=${cri.content} )}">[[${num}]]</a>
+												</li>
+												</th:block>
+
+												<li th:if="${pageDTO.next}">
+													<a th:href="@{noticeListAll(page=${pageDTO.end+1},
+																				amount=${pageDTO.amount},
+																				writer=${cri.writer},
+																				title=${cri.title},
+																				content=${cri.content} )}"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+												</li>
+												
+												<li>
+													<a th:href="@{noticeListAll(page=${pageDTO.pageTotal},
+																				amount=${pageDTO.amount},
+																				writer=${cri.writer},
+																				title=${cri.title},
+																				content=${cri.content} )}"><i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
+												</li>
+				
+											</ul>
+										</div>
+										
+										
+									</li>
+
+								</ul>
+							</li>
+						</ul>
+					</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+
+	</div><!-- end wrap -->
+</th:block>
+
+<script type="text/javascript">
+	//검색버튼
+	$("#noticeSearch").click(function(e) {
+		e.preventDefault();
+		$("form").submit(); //폼태그
+		
+	})
+
+
+</script>
+
+
+
+
+
+
+
+</html>

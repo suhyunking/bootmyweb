@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- .wrap이 basicLayout에 setContent함수에 전달 -->
+<th:block th:replace="~{./include/basicLayout :: setContent( ~{:: .wrap}  ) }">
+
+    <div class="wrap">
+        <div class="warp_inner">
+            <!-- left_menu end -->
+            <div class="right_content">
+                <div class="midiaq">
+                    <div class="mainWrapper"> 
+						<div class="ipssGiudeBlock" style="color:red; font-size: large;">
+							-요구사항<br>
+							-글에 대한 내용을 화면에 출력한다.<br>
+							-해당 글에 해당하는 정보를 미리 보여주도록 처리한다. <br>
+                            <br>
+                            
+						</div>
+					</div>
+                    <div class="page_title">게시글 연습 ><span class="page_subtitle">글 상세보기</span></div>
+                    <div class="full_collum collum">
+                        <ul>
+                            <li class="collum_tit">
+                                <h2>게시글관리</h2>
+                                
+                                <span class="showtoggle minus"></span>
+                                <ul>
+                                    <li>
+                                        <table cellpadding="0" cellspacing="0" class="board_basic_view" width="100%;">
+                                            <tr>
+                                                <th>등록일</th>
+                                                <td>
+                                                    <span>[[${#temporals.format(vo.regdate, 'yyyy-MM-dd')}]]</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>아이디</th>
+                                                <td>[[${vo.writer}]]</td>
+                                            </tr>
+                                        
+                                            <tr>
+                                                <th>제목</th>
+                                                <td colspan="5">[[${vo.title}]]</td>
+                                            </tr>
+                                            <tr>
+                                                <th>내용</th>
+                                                <td colspan="5">
+                                                    <div style="min-height: 300px;">
+                                                    [[${vo.content}]]
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="2">여러분의 의견을 남겨주세요</th>
+                                            </tr>
+                                            <tr>
+                                                <th>댓글등록</th>
+                                                <td>
+                                                    <form name="#####" action="#####" method="post">
+                                                        <input type="hidden" class="inputw290" name="####"><!-- 여기엔무엇이 들어가야할까요 -->
+                                                        <input type="text" class="inputw290" name="####" required placeholder="작성자(나중에 세션값으로 치환)" style="margin-top:10px;">
+                                                        <textarea class="inputw99p" name="####" required style="height: 150px; margin-top:10px;"></textarea>
+                                                        <div class="btn_area">
+                                                            <input type="submit" class="save" value="댓글등록">
+                                                            <input type="button" class="delete" value="전체목록으로">
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <!-- 댓글영역 -->
+
+                                            <tbody class="reply_area">
+                                                <tr>
+                                                    <th>홍길동</th>
+                                                    <td class="reply_content">
+                                                        <div class="left">
+                                                            <span>2021-03-04</span>
+                                                            <p>admin님 가격을 후려치시면 우째요?</p>
+                                                        </div>
+                                                        <input type="button" class="right" value="삭제">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>이순신</th>
+                                                    <td class="reply_content">
+                                                        <div class="left">
+                                                            <span>2021-03-03</span>
+                                                            <p>물건좀 내려주세요</p>
+                                                        </div>
+                                                        <input type="button" class="right" value="삭제">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>홍길자</th>
+                                                    <td class="reply_content">
+                                                        <div class="left">
+                                                            <span>2021-03-02</span>
+                                                            <p>ㅡㅡ^</p>
+                                                        </div>
+                                                        <input type="button" class="right" value="삭제">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <!-- end댓글영역 -->
+                                        </table>
+                                        <form name="#####" action="#####" method="post" style="display: none;">
+                                            ....................
+                                        </form>
+
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <!-- right_content end -->
+        </div>
+        <div class="dim_layer">
+        </div>
+    </div>
+    <!-- wrap end -->
+    </th:block>
+
+</html>

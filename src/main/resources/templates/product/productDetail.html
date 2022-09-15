@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- .wrap이 basicLayout에 setContent함수에 전달 -->
+<th:block th:replace="~{./include/basicLayout :: setContent( ~{:: .wrap}  ) }">
+
+        
+    <div class="wrap">
+        <div class="warp_inner">
+            <!-- left_menu end -->
+            <div class="right_content">
+                <div class="midiaq">
+                    <div class="page_title">상품 관리 > <span class="page_subtitle">상품 상세/수정</span></div>
+                    
+                    
+                    <!-- 폼이름으로 자바스크립트로 제어 -->
+                    <form name="actionForm" action="####" method="####">
+                        <div class="full_collum collum">
+                            <ul>
+                                <li class="collum_tit">
+                                    <h2>상품 상세/수정</h2>
+                                    <a href="#">버튼01</a>
+                                    <a href="#">버튼02</a>
+                                    <span class="showtoggle minus"></span>
+                                    <ul>
+                                        <li>
+                                            <table class="board_basic_view">
+                                                <tbody>
+                                                    <tr>
+														<th>상품번호</th>
+														<!-- hidden태그는 화면에 보이지는 않지만 반드시 필요한 값을 전달할 때 사용합니다 -->
+														<td><input type="hidden" name="prod_id" th:value="${prodVO.prod_id}">[[${prodVO.prod_id}]]</td>
+													</tr>
+                                                    <tr>
+                                                        <th>판매종료일</th>
+                                                        <td><input type="text" class="datepicker" name="prod_enddate" th:value="${prodVO.prod_enddate}" placeholder="날짜선택"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>카테고리</th>
+
+                                                        <td colspan="5">
+                                                            <div>수정이 불가능한 옵션입니다(상품관리자에게 문의하세요)</div>
+                                                            [[${prodVO.category_nav == null ? '없음' : prodVO.category_nav}]]
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>등록자ID</th>
+                                                        <td><input type="text" name="prod_writer" th:value="${prodVO.prod_writer}" readonly /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">제목(상품명)</th>
+                                                        <td><input class="inputw99p margin_center" type="text" name="prod_name" th:value="${prodVO.prod_name}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>메인사진</th>
+                                                        <td colspan="3">
+                                                            <!--미리보기 폼-->
+                                                            <div class="blockContent">
+                                                                <div class="productText">이미지 수정은 목록을 이용해주세요</div>
+                                                                <div class="productImg">
+                                                                	
+                                                                	<th:block th:each="uploadVO : ${uploadList}">
+                                                                    <div class="imgItem">
+                                                                        <span class="imgKind">상품이미지</span>
+                                                                        <div class="imgWrap">
+                                                                            <div class="imgArea">
+                                                                                <img th:src="@{../display(filepath=${uploadVO.filepath},
+                                                                                						  uuid=${uploadVO.uuid},
+                                                                                						  filename=${uploadVO.filename}) }">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    </th:block>`
+                                                                    
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>판매가</th>
+                                                        <td colspan="3"><input type="text" class="inputw150" name="prod_price"
+                                                                th:value="${prodVO.prod_price}" placeholder="3000">원</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>판매수량</th>
+                                                        <td colspan="3"><input type="text" class="inputw150" name="prod_count"
+                                                                th:value="${prodVO.prod_count}" placeholder="숫자로 입력">개</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>할인율</th>
+                                                        <td colspan="3"><input type="text" class="inputw150" name="prod_discount"
+                                                                th:value="${prodVO.prod_discount}" placeholder="15(숫자로 입력)">%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>상품 구매 제한</th>
+                                                        <td colspan="3">
+                                                            <div class="uInputRadioBox">
+                                                                <div class="uInputRadio">
+                                                                    <label>
+                                                                        <input type="radio" name="prod_purchase_yn" value="N" th:checked="${prodVO.prod_purchase_yn == 'N'}">
+                                                                        <span class="text">제한안함</span>
+                                                                    </label>
+                                                                </div>
+                                                                <div class="uInputRadio">
+                                                                    <label>
+                                                                        <input type="radio" name="prod_purchase_yn" value="Y" th:checked="${prodVO.prod_purchase_yn == 'Y'}">
+                                                                        <span class="text">1회 제한</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr>
+                                                        <th>설명</th>
+                                                        <td colspan="5">
+                                                            <div><textarea class="inputw99p" name="prod_content"
+                                                                    style="height: 200px;">[[${prodVO.prod_content}]]</textarea>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr>
+                                                        <th>커맨트 내용</th>
+                                                        <td colspan="5">
+                                                            <div>
+                                                                <textarea class="inputw99p" name="prod_comment"
+                                                                    style="height: 200px;">[[${prodVO.prod_comment}]]</textarea>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+
+                                            <div class="btn_area">
+                                                <a href="#" class="save" th:onclick="|prod_update()|" >저장</a>
+                                                <a th:href="@{productList}" class="revise">목록</a>
+                                                <a href="#" class="delete" th:onclick="|prod_delete()|">삭제</a>
+                                            </div>
+
+                                        </li>
+                                    </ul>
+                                </li>
+
+
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- right_content end -->
+        </div>
+        <div class="dim_layer">
+        </div>
+    </div>
+</th:block>
+
+<!-- 이 페이지에서만 사용할 js코드 -->
+<script th:inline="javascript">
+	function prod_update() {
+		//a, submit은 기본적으로 이동이벤트를 가지고 있습니다.
+		event.preventDefault(); //태그가 가진 기본이벤트 중지
+		//폼제어 -> JS에서는 form태그가 documenet의 자식
+		//document.폼이름.폼속성명
+		//console.log( document.actionForm );
+		document.actionForm.action = "productUpdate";
+		document.actionForm.method = "post"; 
+		document.actionForm.submit(); //서브밋
+	}
+	
+	function prod_delete() {
+		event.preventDefault();
+		document.actionForm.action = "productDelete";
+		document.actionForm.method = "post"; 
+		document.actionForm.submit(); //서브밋
+	}
+</script>
+
+
+
+
+</html>
+
+
